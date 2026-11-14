@@ -5,19 +5,24 @@ import RecipeCard from '../components/RecipeCard';
 import EmptyState from '../components/EmptyState';
 import { recipes, ingredientEmoji } from '../data/recipes';
 import { matchRecipes } from '../utils/matchRecipes';
+import { getRecipeCost, formatRupiah } from '../data/prices';
 import { colors, radius } from '../theme';
+import { useFavorites } from '../context/FavoritesContext';
 
 export default function ResultScreen({ route, navigation }) {
-  // Props/params: daftar bahan dikirim dari HomeScreen lewat navigasi
+  // Daftar bahan yang dikirim dari HomeScreen
   const { selected } = route.params;
 
-  // useMemo: hitung ulang hanya kalau bahan berubah
+  // Mengambil fungsi favorit
+  const { toggleFavorite, isFavorite } = useFavorites();
+
+  // Menghitung resep yang cocok
   const results = useMemo(
     () => matchRecipes(recipes, selected),
     [selected]
   );
 
-  // useEffect: judul halaman menyesuaikan jumlah hasil
+  // Judul halaman menyesuaikan jumlah hasil
   useEffect(() => {
     navigation.setOptions({ title: `${results.length} resep ditemukan` });
   }, [results.length, navigation]);
@@ -35,7 +40,7 @@ export default function ResultScreen({ route, navigation }) {
       <View style={styles.summary}>
         <Text style={styles.summaryTitle}>🧺 Bahan yang kamu punya</Text>
         <Text style={styles.summaryText}>
-          {selected.map((s) => `${ingredientEmoji[s]} ${s}`).join('   ')}
+          {selected.map((s) => `${ingredientEmoji[s] || '🥬'} ${s}`).join('   ')}
         </Text>
       </View>
 
@@ -53,19 +58,29 @@ export default function ResultScreen({ route, navigation }) {
             hint="Coba tambah bahan lain, misalnya telur atau bawang putih."
           />
         }
-        renderItem={({ item }) => (
-          <RecipeCard
-            recipe={item.recipe}
-            matched={item.matched}
-            missing={item.missing}
-            onPress={() =>
-              navigation.navigate('Detail', {
-                recipe: item.recipe,
-                owned: selected,
-              })
-            }
-          />
-        )}
+        renderItem={({ item }) => {
+          // Menghitung biaya resep berdasarkan bahan
+          const recipeWithCost = {
+            ...item.recipe,
+            cost: formatRupiah(getRecipeCost(item.recipe)),
+          };
+
+          return (
+            <RecipeCard
+              recipe={recipeWithCost}
+              matched={item.matched}
+              missing={item.missing}
+              isFavorite={isFavorite(item.recipe.id)}
+              onToggleFavorite={() => toggleFavorite(item.recipe)}
+              onPress={() =>
+                navigation.navigate('Detail', {
+                  recipe: recipeWithCost,
+                  owned: selected,
+                })
+              }
+            />
+          );
+        }}
       />
     </View>
   );

@@ -7,11 +7,13 @@ import { ingredientCost, getRecipeCost, formatRupiah } from '../data/prices';
 import { colors, radius } from '../theme';
 
 export default function DetailScreen({ route, navigation }) {
-  const { recipe, owned } = route.params;
+  const { recipe, owned = [] } = route.params;
 
   useLayoutEffect(() => {
     navigation.setOptions({ title: recipe.name });
   }, [navigation, recipe.name]);
+
+  const totalCost = getRecipeCost(recipe);
 
   return (
     <ScrollView
@@ -22,7 +24,7 @@ export default function DetailScreen({ route, navigation }) {
         <Text style={styles.heroEmoji}>{recipe.emoji}</Text>
         <Text style={styles.title}>{recipe.name}</Text>
         <Text style={styles.meta}>
-          ⏱ {recipe.time}    💰 ± {formatRupiah(getRecipeCost(recipe))} / porsi
+          ⏱ {recipe.time}    💰 ± {formatRupiah(totalCost)} / porsi
         </Text>
       </View>
 
@@ -31,17 +33,18 @@ export default function DetailScreen({ route, navigation }) {
       <View style={styles.box}>
         {recipe.ingredients.map((item) => {
           const have = owned.includes(item);
+          const price = ingredientCost[item] || 0;
 
           return (
             <View key={item} style={styles.ingRow}>
               <Text style={[styles.ing, have ? styles.have : styles.lack]}>
-                {ingredientEmoji[item]}  {item}
+                {ingredientEmoji[item] || '🥬'}  {item}
               </Text>
 
               <Text style={have ? styles.haveNote : styles.lackNote}>
                 {have
                   ? '✓ ada'
-                  : `🛒 beli dulu · ${formatRupiah(ingredientCost[item] || 0)}`}
+                  : `🛒 beli dulu · ${formatRupiah(price)}`}
               </Text>
             </View>
           );

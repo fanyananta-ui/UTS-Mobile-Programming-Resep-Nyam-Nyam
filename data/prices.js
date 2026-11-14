@@ -1,61 +1,68 @@
-// Biaya tiap bahan untuk 1 porsi masakan (dalam rupiah).
-// Acuan: harga pasar tradisional Kota Sukabumi (Pasar Pelita & Tipar Gede)
-// yang dipantau Diskumindag, ditambah perkiraan harga eceran untuk bahan lain.
-// Kalau harga berubah, cukup ganti angka di sini.
+
+// Estimasi biaya tiap bahan untuk 1 porsi masakan (rupiah).
+// Acuan harga komoditas: PIHPS Bank Indonesia,
+// rata-rata pasar Sukabumi, 13 November 2026.
+// Nilai setiap bahan merupakan perkiraan biaya pemakaian per porsi,
+// bukan harga pembelian satu kilogram atau satu kemasan penuh.
+
 export const ingredientCost = {
   // Lauk & protein
-  'telur': 3500,        // 2 butir (telur ±Rp26.000/kg)
-  'tempe': 3000,
+  'telur': 2500,
+  'tempe': 3500,
   'tahu': 3000,
-  'ayam': 6000,         // ±150 gram (ayam ±Rp39.000/kg)
-  'ikan': 6000,
-  'udang': 9000,
-  'teri': 3000,
-  'sosis': 3000,
-  'bakso': 4000,
-  // Karbo
-  'nasi': 2000,
+  'ayam': 6500,
+  'ikan': 7000,
+  'udang': 10000,
+  'teri': 3500,
+  'sosis': 4000,
+  'bakso': 4500,
+
+  // Karbohidrat
+  'nasi': 2500,
   'mie instan': 3500,
-  'bihun': 3000,
-  'roti': 3000,
-  'kentang': 3000,
-  'tepung terigu': 1500,
-  // Sayur
-  'kol': 2000,
-  'sawi': 2000,
+  'bihun': 3500,
+  'roti': 4000,
+  'kentang': 3500,
+  'tepung terigu': 2000,
+
+  // Sayuran
+  'kol': 1500,
+  'sawi': 1500,
   'wortel': 1500,
-  'bayam': 2000,
-  'kangkung': 2000,
-  'tomat': 1000,
+  'bayam': 1500,
+  'kangkung': 1500,
+  'tomat': 1500,
   'timun': 1000,
-  'terong': 2000,
-  'jagung': 3000,
-  // Bumbu & lainnya
-  'bawang merah': 1000, // ±Rp32.000/kg
-  'bawang putih': 500,  // ±Rp30.000/kg
-  'cabai': 1500,        // cabai harganya paling sering berubah
+  'terong': 2500,
+  'jagung': 3500,
+
+  // Bumbu & bahan lainnya
+  'bawang merah': 1500,
+  'bawang putih': 1000,
+  'cabai': 2000,
   'daun bawang': 1000,
-  'kecap': 1000,
-  'saus sambal': 1000,
-  'santan': 2500,
-  'susu': 2000,
-  'keju': 3000,
-  'margarin': 1000,
+  'kecap': 1500,
+  'saus sambal': 1500,
+  'santan': 3000,
+  'susu': 2500,
+  'keju': 3500,
+  'margarin': 1500,
 };
 
-// Minyak goreng, garam, merica, gula, dan gas (dibulatkan)
-export const BASE_COST = 1000;
+// Perkiraan biaya minyak, garam, merica, gula, dan gas.
+export const BASE_COST = 1500;
 
-// Hitung biaya 1 porsi resep = jumlah biaya semua bahan + biaya dasar
+// Menghitung estimasi biaya bahan untuk satu porsi.
 export function getRecipeCost(recipe) {
   const total = recipe.ingredients.reduce(
     (sum, name) => sum + (ingredientCost[name] || 0),
     0
   );
+
   return total + BASE_COST;
 }
 
-// Ubah angka jadi tulisan rupiah, contoh: 9000 -> "Rp 9.000"
+// Mengubah angka menjadi format rupiah.
 export function formatRupiah(value) {
   return 'Rp ' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }

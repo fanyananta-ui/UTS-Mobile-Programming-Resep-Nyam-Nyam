@@ -58,7 +58,9 @@ export default function HomeScreen({ navigation }) {
       <View style={styles.footer}>
         <Pressable
           disabled={!canSearch}
-          onPress={() => navigation.navigate('Result', { selected })}
+          onPress={() =>
+            navigation.getParent()?.navigate('Result', { selected })
+          }
           style={[styles.button, !canSearch && styles.buttonOff]}
         >
           <Text style={styles.buttonText}>

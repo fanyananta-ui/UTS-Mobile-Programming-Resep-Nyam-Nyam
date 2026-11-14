@@ -4,40 +4,76 @@ import { Pressable, View, Text, StyleSheet } from 'react-native';
 import { colors, radius } from '../theme';
 import { getRecipeCost, formatRupiah } from '../data/prices';
 
-// props: recipe, matched, missing, onPress
-export default function RecipeCard({ recipe, matched, missing, onPress }) {
+export default function RecipeCard({
+  recipe,
+  matched = [],
+  missing = [],
+  onPress,
+  isFavorite = false,
+  onToggleFavorite,
+  showMatch = true,
+}) {
   const complete = missing.length === 0;
 
   return (
-    <Pressable onPress={onPress} style={styles.card}>
-      <View style={styles.iconBubble}>
-        <Text style={styles.icon}>{recipe.emoji}</Text>
-      </View>
-
-      <View style={styles.body}>
-        <Text style={styles.name}>{recipe.name}</Text>
-
-        <Text style={styles.meta}>
-          ⏱ {recipe.time}   💰 ± {formatRupiah(getRecipeCost(recipe))}
-        </Text>
-
-        <View style={[styles.badge, complete ? styles.badgeOk : styles.badgeWarn]}>
-          <Text style={[styles.badgeText, complete && styles.badgeTextOk]}>
-            {complete ? '✅ Semua bahan ada!' : `🛒 Kurang: ${missing.join(', ')}`}
-          </Text>
+    <View style={styles.card}>
+      <Pressable onPress={onPress} style={styles.main}>
+        <View style={styles.iconBubble}>
+          <Text style={styles.icon}>{recipe.emoji}</Text>
         </View>
 
-        <Text style={styles.count}>
-          {matched.length}/{recipe.ingredients.length} bahan cocok
+        <View style={styles.body}>
+          <Text style={styles.name}>{recipe.name}</Text>
+
+          <Text style={styles.meta}>
+            ⏱ {recipe.time}   💰 ± {formatRupiah(getRecipeCost(recipe))}
+          </Text>
+
+          {showMatch && (
+            <>
+              <View
+                style={[
+                  styles.badge,
+                  complete ? styles.badgeOk : styles.badgeWarn,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.badgeText,
+                    complete && styles.badgeTextOk,
+                  ]}
+                >
+                  {complete
+                    ? '✅ Semua bahan ada!'
+                    : `🛒 Kurang: ${missing.join(', ')}`}
+                </Text>
+              </View>
+
+              <Text style={styles.count}>
+                {matched.length}/{recipe.ingredients.length} bahan cocok
+              </Text>
+            </>
+          )}
+        </View>
+      </Pressable>
+
+      <Pressable
+        onPress={onToggleFavorite}
+        style={styles.favoriteButton}
+        hitSlop={8}
+      >
+        <Text style={styles.favoriteIcon}>
+          {isFavorite ? '❤️' : '🤍'}
         </Text>
-      </View>
-    </Pressable>
+      </Pressable>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: colors.card,
     borderRadius: radius.md,
     padding: 14,
@@ -51,6 +87,10 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOffset: { width: 0, height: 3 },
     elevation: 2,
+  },
+  main: {
+    flex: 1,
+    flexDirection: 'row',
   },
   iconBubble: {
     width: 64,
@@ -102,5 +142,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: colors.muted,
     marginTop: 6,
+  },
+  favoriteButton: {
+    padding: 8,
+    marginLeft: 4,
+    alignSelf: 'flex-start',
+  },
+  favoriteIcon: {
+    fontSize: 23,
   },
 });
